@@ -4,8 +4,8 @@ ARG IMG
 ENV TRIVY_NEW_JSON_SCHEMA=true
 RUN mkdir /root/.docker
 # RUN echo $VUL $IMG > /mnt/v.txt
-RUN --mount=type=secret,id=docker,dst=/root/.docker/config.json trivy image --cache-dir /tmp/trivy/ "$IMG" -f json --no-progress > /mnt/trivy.out
-RUN --mount=type=secret,id=docker,dst=/root/.docker/config.json trivy image --cache-dir /tmp/trivy/ "$IMG" -f json --exit-code 222 --severity "$VUL" --no-progress > /dev/null ; echo $? > /mnt/trivy.result
+RUN --mount=type=secret,id=docker,dst=/root/.docker/config.json trivy image --scanners vuln --cache-dir /tmp/trivy/ "$IMG" -f json --no-progress > /mnt/trivy.out
+RUN --mount=type=secret,id=docker,dst=/root/.docker/config.json trivy image --scanners vuln --cache-dir /tmp/trivy/ "$IMG" -f json --exit-code 222 --severity "$VUL" --no-progress > /dev/null ; echo $? > /mnt/trivy.result
 
 FROM scratch as testresult
 COPY --from=builder /mnt/trivy.result /mnt/trivy.out /
